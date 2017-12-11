@@ -1,0 +1,154 @@
+body, input
+{
+    font-family: 'lucida sans unicode', lucida, helvetica, verdana, arial, sans-serif;
+    color: #44352C;
+    font-size: 13px;
+}
+
+a
+{
+    color: #0080FF;
+    text-decoration:none;
+    border-bottom: 1px orange dashed;
+}
+
+a:hover 
+{
+    color: #9B9C83;
+}
+
+#container
+{
+    border: 3px #ddd double;
+-moz-border-radius:10px;
+-webkit-border-radius:10px;
+-khtml-border-radius:10px;
+border-radius:10px;
+-moz-box-sizing:content-box;
+    margin: auto;
+    padding: 5px;
+    width: 250px;
+}
+
+#title
+{
+
+    margin: 0;
+	font-weight: bold;
+	font-size: 24px;
+	color: #336699;
+	font-family: "Microsoft JhengHei","Lucida Grande","Arial","Arial Narrow";
+    text-shadow: 0 0 10px #A6A6A6;
+}
+
+ul#navigation, ul#form
+{
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul#navigation
+{
+    float: right;
+}
+
+ul#form
+{
+    clear: both;
+}
+
+ul#navigation li
+{
+    float: left;
+    margin: 0;
+    padding: 5px 0;
+    border-top: 2px #BFAA9B solid;
+}
+
+ul#navigation li a
+{
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #ABCDEF;
+    padding: 5px 15px;
+    margin-left: 1px;
+    text-decoration: none;
+    border-bottom: 0 #ffffff solid;
+}
+
+ul#navigation li  a:hover
+{
+    color: #44352C;
+}
+
+ul#form li
+{
+   float:left;
+   width:240px;
+}
+
+#footer
+{
+    color: #9B9C83;
+    font-size: small;
+    text-align: right;
+}
+
+#address_bar
+{
+    border-top: 2px #EEE outset;
+    border-bottom: 3px #EEE outset;
+    background-color: #ABCDEF;
+    text-align: left;
+    padding: 5px;
+    color: #222;
+}
+
+#go
+{
+    background-color: #222;
+    font-weight: bold;
+    color: #ABCDEF;
+    border: 0 #ffffff solid;
+    padding: 2px;
+}
+
+#address_box
+{
+    width:185px;
+}
+
+.option
+{   
+    padding: 2px 0;
+}
+
+.option label
+{
+    border-bottom: 2px #ffffff solid;
+}
+
+form
+{
+    margin: 0;
+}
+
+#error, #auth
+{
+    background-color: #BF6464;
+    border-top: 1px solid #44352C;
+    border-bottom: 1px solid #44352C;
+    width: 730px;
+    clear: both;
+}
+
+#auth
+{
+    background-color: #94C261;
+}
+
+#error p, #auth p, #auth form
+{
+    margin: 5px;
+}

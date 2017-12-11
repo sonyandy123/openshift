@@ -1,0 +1,223 @@
+<!-- VMware ESXi Rebooter ver.1.0.20160321.1630 By sonyandy123 -->
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>VMware ESXi Rebooter 網頁管理端</title>
+		<script type="text/javascript" src="js/jquery-1.12.2.min.js"></script>
+		<script type="text/javascript">
+			function getRandom(minNum, maxNum) {
+				return Math.floor( Math.random() * (maxNum - minNum + 1) ) + minNum;
+			}
+			function getRndText(textLenth){
+				var returnText = "";
+				for (var i = 0; i < textLenth; i++){
+					if (getRandom(0, 1) == 0){
+						returnText += String.fromCharCode(getRandom(48, 57));
+					}else{
+						returnText += String.fromCharCode(getRandom(97, 122));
+					}
+				}
+				return returnText;
+			}
+			function edit_exist_items(){
+				var sel_doing_val = $("#sel_doing").val().toString();
+				var sel_uid_val = $("#sel_uid").find(":selected").val().toString();
+				var sel_pwd_val = $("#edit_pwd").val().toString();
+				if (sel_doing_val == "kill_uid"){
+					ajax_kill_exist_items(sel_uid_val, sel_pwd_val);
+				} else if (sel_doing_val == "edit_cycle"){
+					ajax_edit_cycle(sel_uid_val, sel_pwd_val, $("#new_cycle").val());
+				} else {
+					alert("發生未知的錯誤，無法執行操作！");
+				}
+			}
+			function new_cycle_span_display(using_id){
+				if (using_id == "kill_uid"){
+					$("#new_cycle_span").hide();
+				} else if (using_id == "edit_cycle"){
+					$("#new_cycle_span").show();
+				}
+			}
+			function ajax_add_uid(){
+				var URLs="ajax/ajax_add_uid.php";
+				var data = new Array();
+				data[0] = $('#uid').val();
+				data[1] = $('#cycle').val();
+				data[2] = $('#pwd').val();
+				if (data[0] == "" || data[1] == "" || data[2] == ""){
+					alert("您有資料沒填！");
+				}else{
+					if (confirm("您確定要新增任務嗎？")){
+						$.ajax({
+							url: URLs,
+							data: {data:data},
+							type: "POST",
+							dataType: 'html',
+
+							success: function(msg){
+								if (msg == "ok"){
+									var print_script = "filepath=\"/tmp/reboot.sh\"\nwget -O $filepath " + location.href + "download_shell.php?u=" + data[0] + "\nif [ -e $filepath ];then\n\tchmod 777 $filepath\n\tsh $filepath\nfi";
+									$("#print_script").val(print_script);
+									ajax_get_exist_items();
+									alert("已新增一個任務！");
+								} else if (msg == "id_exist"){
+									alert("您指定的 ID 已存在，請改用別的 ID！");
+								} else {
+									alert("發生未知的錯誤，無法新增資料！");
+								}
+							},
+
+							error:function(xhr, ajaxOptions, thrownError){
+								alert("發生錯誤！\n\n錯誤代碼：" + xhr.status + "\n錯誤訊息：" + thrownError);
+							}
+						});
+					}
+				}
+			}
+			function ajax_get_exist_items(){
+				var URLs="ajax/ajax_get_exist_items.php";
+				$.ajax({
+					url: URLs,
+					data: null,
+					type: "POST",
+					dataType: 'json',
+
+					success: function(msg){
+						if (msg != ""){
+							var table_null = true;
+							$('#exist_items').empty();
+							$("#sel_uid option").remove();
+							var html_table = "<table border='1'>\n<tr>\n<td>ID</td><td>已跑次數</td><td>目標次數</td>\n</tr>";
+							for (var key in msg){
+								html_table += "<tr><td>" + msg[key]["uid"] + "</td><td>" + msg[key]["cycled"] + "</td><td>" + msg[key]["cycle"] + "</td></tr>";
+								$("#sel_uid").append($("<option></option>").attr("value", msg[key]["uid"]).text(msg[key]["uid"]));
+								table_null = false;
+							}
+							html_table += "</table>";
+							$('#exist_items').append(html_table);
+							if (table_null == true){
+								$("#edit_exist_items_div").hide();
+								$("#exist_items_div").hide();
+							} else {
+								$("#edit_exist_items_div").show();
+								$("#exist_items_div").show();
+							}
+						} else {
+							alert("發生未知的錯誤！");
+						}
+					},
+
+					error:function(xhr, ajaxOptions, thrownError){
+						alert("發生錯誤！\n\n錯誤代碼：" + xhr.status + "\n錯誤訊息：" + thrownError);
+					}
+				});
+			}
+			function ajax_kill_exist_items(killUid, killPwd){
+				var URLs="ajax/ajax_kill_exist_items.php";
+				var data = new Array();
+				data[0] = killUid.toString();
+				data[1] = killPwd.toString();
+				if (data[1] == ""){
+					alert("請輸入密碼！");
+				}else{
+					if (confirm("您確定要中斷並刪除這個任務嗎？")){
+						$.ajax({
+							url: URLs,
+							data: {data:data},
+							type: "POST",
+							dataType: 'html',
+
+							success: function(msg){
+								if (msg == "ok"){
+									ajax_get_exist_items();
+									alert("已中斷並刪除一個任務！");
+								} else if (msg == "pwd_error"){
+									alert("密碼錯誤！");
+								}else{
+									alert("發生未知的錯誤！");
+								}
+							},
+
+							error:function(xhr, ajaxOptions, thrownError){
+								alert("發生錯誤！\n\n錯誤代碼：" + xhr.status + "\n錯誤訊息：" + thrownError);
+							}
+						});
+					}
+				}
+			}
+			function ajax_edit_cycle(editUid, editPwd, editCycle){
+				var URLs="ajax/ajax_edit_cycle.php";
+				var data = new Array();
+				data[0] = editUid.toString();
+				data[1] = editPwd.toString();
+				data[2] = editCycle.toString();
+				if (data[1] == ""){
+					alert("請輸入密碼！");
+				}else{
+					if (confirm("您確定要編輯這個任務的目標次數嗎？")){
+						$.ajax({
+							url: URLs,
+							data: {data:data},
+							type: "POST",
+							dataType: 'html',
+
+							success: function(msg){
+								if (msg == "ok"){
+									ajax_get_exist_items();
+									alert("已編輯這個任務的目標次數！");
+								} else if (msg == "pwd_error"){
+									alert("密碼錯誤！");
+								}else{
+									alert("發生未知的錯誤！");
+								}
+							},
+
+							error:function(xhr, ajaxOptions, thrownError){
+								alert("發生錯誤！\n\n錯誤代碼：" + xhr.status + "\n錯誤訊息：" + thrownError);
+							}
+						});
+					}
+				}
+			}
+			function startup(){
+				ajax_get_exist_items();
+				new_cycle_span_display($("#sel_doing").find(":selected").val());
+			}
+		</script>
+	</head>
+	<body onLoad="startup();">
+		<div style="float: left;">
+			<p>※新增一個任務※</p>
+			<p>輸入 ID（英數）：<input type="text" name="uid" id="uid" maxlength=20> <input type="button" id="rnd_uid" value="隨機產生" onClick="$('#uid').val(getRndText(10));">　</p>
+			<p>輸入次數：<input type="text" name="cycle" id="cycle" maxlength=5></p>
+			<p>輸入密碼：<input type="password" name="pwd" id="pwd" maxlength=50></p>
+			<p><input type="button" id="add_uid" value="送出" onClick="ajax_add_uid();"></p>
+		</div>
+		<div id="edit_exist_items_div" style="float: left;">
+			<p>※編輯一個任務※</p>
+			<p>選擇 ID：<select name="sel_uid" id="sel_uid"></select></p>
+			<p>
+				選擇操作：
+				<select name="sel_doing" id="sel_doing" onChange="new_cycle_span_display(this.value);">
+					<option value="kill_uid">中斷並刪除</option>
+					<option value="edit_cycle">編輯目標次數</option>
+				</select>
+				<span id="new_cycle_span">
+					次數：
+					<input type="text" name="new_cycle" id="new_cycle" maxlength=5>
+				</span>
+			</p>
+			<p>輸入密碼：<input type="password" name="edit_pwd" id="edit_pwd" maxlength=50></p>
+			<p><input type="button" id="edit_uid" value="送出" onClick="edit_exist_items();"></p>
+		</div>
+		<div style="clear: left;">
+			<p>※輸出的腳本※<br />將 /etc/rc.local.d/local.sh 裡的 exit 0 前方加上 # 並在下方新增這些指令</p>
+			<p><textarea id="print_script" cols="90" rows="6" readonly></textarea></p>
+		</div>
+		<div id="exist_items_div" style="clear: left;">
+			<p>※已存在的任務※ <input type="button" id="update" value="重新載入" onClick="ajax_get_exist_items();"></p>
+			<div id="exist_items"></div>
+		</div>
+	</body>
+</html>
