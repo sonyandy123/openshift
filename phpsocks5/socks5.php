@@ -91,7 +91,7 @@ function phpsocks5_usleep($usec)
 
 phpsocks5_log("process 1");
 
-$phpsid = mysql_escape_string($_COOKIE[$sesscookiekey]);
+$phpsid = mysql_real_escape_string($_COOKIE[$sesscookiekey]);
 
 phpsocks5_log("process 2 $phpsid");
 
@@ -216,9 +216,9 @@ if($postdata[2] == "1")
 	if(!session_start())
 		phpsocks5_http_500('session_start error');
 	phpsocks5_log("connect process 2");
-	$host = mysql_escape_string(strtok(substr($postdata, 3), ':'));
-	$port = mysql_escape_string(strtok(':'));
-	$phpsid = mysql_escape_string(session_id());
+	$host = mysql_real_escape_string(strtok(substr($postdata, 3), ':'));
+	$port = mysql_real_escape_string(strtok(':'));
+	$phpsid = mysql_real_escape_string(session_id());
 	phpsocks5_log("connect process 3 $phpsid");
 	mysql_query("DELETE FROM ${dbprefix}conning WHERE sid = '" . $phpsid . "'");
 	mysql_query("DELETE FROM ${dbprefix}sending WHERE sid = '" . $phpsid . "'");
